@@ -50,9 +50,12 @@ def folder_file_def():
     f.write("Time (s)"+","+"Counter"+","+"Pixel intensity"+"\n")
     f.close()
 
-stop_threads_valve=True
+
 stop_threads=False
 continueRecording = False
+continueActuating = False
+stop_threads_valve=True
+actuate_once_var=True
 expo=100
 SaveFPS=2
 sliderposshift=4
@@ -63,6 +66,26 @@ def change_state():
         continueRecording = False 
     else: 
         continueRecording = True 
+        
+        
+def change_state_actuate(): 
+    global continueActuating
+    if continueActuating == True: 
+        continueActuating = False 
+    else: 
+        continueActuating = True 
+        
+
+        
+def change_state_actuate_once(): 
+    global actuate_once_var
+    if actuate_once_var: 
+        actuate_once_var=False
+    else: 
+        actuate_once_var=True
+        
+    
+        
 
 #Global Variables
 #Set default values for x y w h sliders
@@ -85,20 +108,20 @@ gui = Label(root)
 gui.grid(row=1, column=0)
 
 DeviceLabel=Label(gui, text="Device").grid(row=1, column=0, padx=0, pady=0)
-Devicetxt = Text(gui, height = 1, width = 20)
+Devicetxt = Text(gui, height = 1, width = 10)
 Devicetxt.grid(row=1, column=1, padx=0, pady=0)
 
-Param1Label=Label(gui, text="Frequency").grid(row=2, column=0, padx=0, pady=0)
-Param1txt = Text(gui, height = 1, width = 20)
+Param1Label=Label(gui, text="Frequency (Hz)").grid(row=2, column=0, padx=0, pady=0)
+Param1txt = Text(gui, height = 1, width = 10)
 Param1txt.grid(row=2, column=1, padx=0, pady=0)
 Param1txt.insert(END, '1')
 
-Param2Label=Label(gui, text="Voltage").grid(row=3, column=0, padx=0, pady=0)
-Param2txt = Text(gui, height = 1, width = 20)
+Param2Label=Label(gui, text="Flow rate (ul/min)").grid(row=3, column=0, padx=0, pady=0)
+Param2txt = Text(gui, height = 1, width = 10)
 Param2txt.grid(row=3, column=1, padx=0, pady=0)
 
 TrialLabel=Label(gui, text="Trial").grid(row=4, column=0, padx=0, pady=0)
-Trialtxt = Text(gui, height = 1, width = 20)
+Trialtxt = Text(gui, height = 1, width = 10)
 Trialtxt.grid(row=4, column=1, padx=0, pady=0)
 Trialtxt.insert(END, '1')
 
@@ -208,6 +231,21 @@ def setVariables():
 #     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
 #     cv2.imwrite(imfoldname+"/"+filename+ ".jpg",cv2image)
 
+def gui_handler(): 
+    change_state()
+    if continueRecording:
+        stop_threads=False
+        RecordButton.configure(text='Recording',bg='green', fg='white')
+        getTextVals()
+        folder_file_def()
+        fileLabel.config(text=csvname)
+        status.config(text='Recording', foreground='green')
+        threading.Thread(target=recorder).start()
+    else:
+        RecordButton.configure(text='Record', bg='red', fg='black')
+        status.config(text='Not Recording')
+        stop_threads=True
+
 def recorder():
     counter=0
     maximumpix=0
@@ -239,48 +277,39 @@ def recorder():
                 cap.release()
                 break
 
-def actuate_valve_thread():
-    global stop_threads_valve
-    stop_threads_valve=False
-    if not stop_threads_valve:
+def gui_handler_actuate(): 
+    change_state_actuate()
+    if continueActuating:
+        stop_threads_valve=False
         ActuateButton.configure(text='Actuating',bg='green', fg='white')
         threading.Thread(target=actuate_valve).start()
     else:
-        ActuateButton.configure(text='Actuate',bg='black', fg='white')        
+        ActuateButton.configure(text='Actuate',bg='black', fg='white')
+        stop_threads_valve=True
 
-        
+    
 def actuate_valve():
     global freq, stop_threads_valve
-    getTextVals()    
-    while not stop_threads_valve:
+    getTextVals()
+    while continueActuating:
         timestart=time.time()
-        GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        print(1)
         time.sleep(1/float(freq)/2 - (time.time()-timestart))        
         timestart=time.time()
-        GPIO.output(pin, GPIO.LOW)  # Turn off the LED
+        #GPIO.output(pin, GPIO.LOW)  # Turn off the LED
+        print(0)
         time.sleep(1/float(freq)/2 - (time.time()-timestart))
             
-            
-def stop_actuate_thread():
-    global stop_threads_valve
-    GPIO.output(pin, GPIO.LOW)  # Turn off the LED
-    stop_threads_valve=True
-
-def gui_handler(): 
-    change_state()
-    if continueRecording:
-        stop_threads=False
-        RecordButton.configure(text='Recording',bg='green', fg='white')
-        getTextVals()
-        folder_file_def()
-        fileLabel.config(text=csvname)
-        status.config(text='Recording', foreground='green')
-        threading.Thread(target=recorder).start()
+def actuate_once_valve():
+    change_state_actuate_once()    
+    if actuate_once_var:
+        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        print(1)
     else:
-        RecordButton.configure(text='Record', bg='red', fg='black')
-        status.config(text='Not Recording')
-        stop_threads=True
-    
+        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        print(0)
+            
 def quit_handle():
     global stop_threads
     stop_threads=True
@@ -298,11 +327,11 @@ RecordButton.grid(row=sliderposshift+7, column=0, padx=1, pady=1)
 
 QuitButton = Button(gui, text="Quit",command = quit_handle, activebackground='red').grid(row=sliderposshift+8, column=0, padx=1, pady=1)
 
-ActuateButton = Button(gui, text='Actuate valve',command = actuate_valve_thread)
+ActuateButton = Button(gui, text='Actuate valve',command = gui_handler_actuate)
 ActuateButton.grid(row=sliderposshift+11, column=0, padx=1, pady=1)
 
-StopActuateButton = Button(gui, text='Stop valve',command = stop_actuate_thread)
-StopActuateButton.grid(row=sliderposshift+11, column=1, padx=1, pady=1)
+ActuateOnceButton = Button(gui, text='Act once valve',command = actuate_once_valve, activebackground='red')
+ActuateOnceButton.grid(row=sliderposshift+11, column=1, padx=1, pady=1)
 
 #Loop the code
 root.mainloop()

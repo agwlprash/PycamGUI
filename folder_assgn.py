@@ -12,7 +12,7 @@ def createFolder(directory):
         print ('Error: Creating directory.' + directory)
 
 def casedef(geom,freq,volt,trial):
-    fname=geom+'_'+freq+'_'+volt+'_t'+trial
+    fname=geom+'_'+freq+'Hz_'+volt+'ulmin_t'+trial
     createFolder(date)
     foldname=date
     imfoldname=foldname+'/'+fname
