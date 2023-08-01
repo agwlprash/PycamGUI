@@ -2,7 +2,7 @@ import os
 import time
 
 today=time.localtime(time.time())
-date=str(today.tm_year)+'-'+f"{today.tm_mon:02}"+'-'+f"{today.tm_mon:02}"
+date=str(today.tm_year)+'-'+f"{today.tm_mon:02}"+'-'+f"{today.tm_mday:02}"
 
 def createFolder(directory):
     try:
