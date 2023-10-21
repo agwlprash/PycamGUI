@@ -46,7 +46,7 @@ def folder_file_def():
 
 stop_threads=False
 continueRecording = False
-expo=100
+expo=15
 SaveFPS=2
 sliderposshift=4
 
@@ -100,43 +100,55 @@ def getTextVals():
     volt=Param2txt.get(1.0, 'end-1c')
     trial=Trialtxt.get(1.0, 'end-1c')
 
-expoEntry = Scale(gui, from_=0, to=400, orient=HORIZONTAL, label='Exposure')
+expoLabel = Label(gui, text="Exposure")
+expoLabel.grid(row=sliderposshift+1, column=0, padx=0, pady=0)
+expoEntry = Scale(gui, from_=0, to=1000, orient=HORIZONTAL)
 expoEntry.set(expo)
-expoEntry.grid(row=sliderposshift+1, column=0, padx=0, pady=0)
+expoEntry.grid(row=sliderposshift+1, column=1, padx=0, pady=0)
 
-SfpsEntry = Scale(gui, from_=0, to=20, orient=HORIZONTAL, label='SaveFPS')
+SfpsLabel = Label(gui, text="SaveFPS")
+SfpsLabel.grid(row=sliderposshift+2, column=0, padx=0, pady=0)
+SfpsEntry = Scale(gui, from_=0, to=20, orient=HORIZONTAL)
 SfpsEntry.set(SaveFPS)
-SfpsEntry.grid(row=sliderposshift+1, column=1, padx=0, pady=0)
+SfpsEntry.grid(row=sliderposshift+2, column=1, padx=0, pady=0)
 
 #Define x and y entry box labels and boxes
-xEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Pixel X')
+xLabel = Label(gui, text="xpix, ximage")
+xLabel.grid(row=sliderposshift+3, column=0, padx=0, pady=0)
+xEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 xEntry.set(defaultX)
-xEntry.grid(row=sliderposshift+3, column=0, padx=0, pady=0)
+xEntry.grid(row=sliderposshift+3, column=1, padx=0, pady=0)
 
-xpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Image X')
+xpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 xpEntry.set(defaultX)
-xpEntry.grid(row=sliderposshift+3, column=1, padx=0, pady=0)
+xpEntry.grid(row=sliderposshift+3, column=2, padx=0, pady=0)
 
-wEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Pixel width')
-wEntry.set(defaultW)
-wEntry.grid(row=sliderposshift+4, column=0, padx=0, pady=0)
-wpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Image width')
-wpEntry.set(defaultX)
-wpEntry.grid(row=sliderposshift+4, column=1, padx=0, pady=0)
-
-yEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Pixel Y')
+yLabel = Label(gui, text="ypix, yimage")
+yLabel.grid(row=sliderposshift+4, column=0, padx=0, pady=0)
+yEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 yEntry.set(defaultY)
-yEntry.grid(row=sliderposshift+5, column=0, padx=0, pady=0)
-ypEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Image Y')
+yEntry.grid(row=sliderposshift+4, column=1, padx=0, pady=0)
+ypEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 ypEntry.set(defaultX)
-ypEntry.grid(row=sliderposshift+5, column=1, padx=0, pady=0)
+ypEntry.grid(row=sliderposshift+4, column=2, padx=0, pady=0)
 
-hEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Pixel height')
+wLabel = Label(gui, text="wpix, wimage")
+wLabel.grid(row=sliderposshift+5, column=0, padx=0, pady=0)
+wEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
+wEntry.set(defaultW)
+wEntry.grid(row=sliderposshift+5, column=1, padx=0, pady=0)
+wpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
+wpEntry.set(defaultX)
+wpEntry.grid(row=sliderposshift+5, column=2, padx=0, pady=0)
+
+hLabel = Label(gui, text="hpix, himage")
+hLabel.grid(row=sliderposshift+6, column=0, padx=0, pady=0) 
+hEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 hEntry.set(defaultH)
-hEntry.grid(row=sliderposshift+6, column=0, padx=0, pady=0)
-hpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL, label='Image height')
+hEntry.grid(row=sliderposshift+6, column=1, padx=0, pady=0)
+hpEntry = Scale(gui, from_=sliderFrom, to=sliderTo, orient=HORIZONTAL)
 hpEntry.set(defaultX)
-hpEntry.grid(row=sliderposshift+6, column=1, padx=0, pady=0)
+hpEntry.grid(row=sliderposshift+6, column=2, padx=0, pady=0)
 
 
 #Display for pixel intensity
@@ -216,7 +228,7 @@ def recorder():
             log.write(str(time.time()-timestart)+","+str(counter)+","+str(pix)+"\n")
             log.flush()
             #saving image at time instant
-            cvfilename = imfoldname+"/"+filename+"_" +  f"{counter:05}" + ".jpg"
+            cvfilename = imfoldname+"/"+filename+"_000" +  str(counter) + ".jpg"
             #cvfilename_crop = imfoldname+"/"+filename+"_crop_000" +  str(counter) + ".jpg"
             #cv2.imwrite(cvfilename, cv2image)
             cv2.imwrite(cvfilename, img_crop2)

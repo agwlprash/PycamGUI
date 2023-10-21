@@ -2,7 +2,7 @@ import os
 import time
 
 today=time.localtime(time.time())
-date=str(today.tm_year)+'-'+f"{today.tm_mon:02}"+'-'+f"{today.tm_mday:02}"
+date=str(today.tm_year)+'-'+str(today.tm_mon)+'-'+str(today.tm_mday)
 
 def createFolder(directory):
     try:
@@ -12,7 +12,7 @@ def createFolder(directory):
         print ('Error: Creating directory.' + directory)
 
 def casedef(geom,freq,volt,trial):
-    fname=geom+'_'+freq+'Hz_'+volt+'ulmin_t'+trial
+    fname=geom+'_'+freq+'_'+volt+'_t'+trial
     createFolder(date)
     foldname=date
     imfoldname=foldname+'/'+fname

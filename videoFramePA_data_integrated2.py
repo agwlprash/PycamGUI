@@ -27,13 +27,13 @@ import matplotlib.pyplot as plt
 import threading
 import os, sys
 import folder_assgn as folders
-"""
+
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 pin=27
 GPIO.setup(pin, GPIO.OUT)
 GPIO.setwarnings(False)
-"""
+
 #creating folder and file names
 
 def folder_file_def():
@@ -67,15 +67,12 @@ def change_state():
     else: 
         continueRecording = True 
         
-        
 def change_state_actuate(): 
     global continueActuating
     if continueActuating == True: 
         continueActuating = False 
     else: 
         continueActuating = True 
-        
-
         
 def change_state_actuate_once(): 
     global actuate_once_var
@@ -84,9 +81,6 @@ def change_state_actuate_once():
     else: 
         actuate_once_var=True
         
-    
-        
-
 #Global Variables
 #Set default values for x y w h sliders
 defaultResX = 640
@@ -108,20 +102,20 @@ gui = Label(root)
 gui.grid(row=1, column=0)
 
 DeviceLabel=Label(gui, text="Device").grid(row=1, column=0, padx=0, pady=0)
-Devicetxt = Text(gui, height = 1, width = 10)
+Devicetxt = Text(gui, height = 1, width = 20)
 Devicetxt.grid(row=1, column=1, padx=0, pady=0)
 
-Param1Label=Label(gui, text="Frequency (Hz)").grid(row=2, column=0, padx=0, pady=0)
-Param1txt = Text(gui, height = 1, width = 10)
+Param1Label=Label(gui, text="Frequency").grid(row=2, column=0, padx=0, pady=0)
+Param1txt = Text(gui, height = 1, width = 20)
 Param1txt.grid(row=2, column=1, padx=0, pady=0)
 Param1txt.insert(END, '1')
 
-Param2Label=Label(gui, text="Flow rate (ul/min)").grid(row=3, column=0, padx=0, pady=0)
-Param2txt = Text(gui, height = 1, width = 10)
+Param2Label=Label(gui, text="Voltage").grid(row=3, column=0, padx=0, pady=0)
+Param2txt = Text(gui, height = 1, width = 20)
 Param2txt.grid(row=3, column=1, padx=0, pady=0)
 
 TrialLabel=Label(gui, text="Trial").grid(row=4, column=0, padx=0, pady=0)
-Trialtxt = Text(gui, height = 1, width = 10)
+Trialtxt = Text(gui, height = 1, width = 20)
 Trialtxt.grid(row=4, column=1, padx=0, pady=0)
 Trialtxt.insert(END, '1')
 
@@ -183,10 +177,10 @@ statusLabel.grid(row=sliderposshift+9, column=0, padx=1, pady=1)
 status = Label(gui, text='Not recording', foreground='red')
 status.grid(row=sliderposshift+9, column=1, padx=1, pady=1) 
 
-fileLabeltxt = Label(gui, text='File name:')
-fileLabeltxt.grid(row=sliderposshift+10, column=0, padx=1, pady=1) 
-fileLabel = Label(gui, text='NA')
-fileLabel.grid(row=sliderposshift+10, column=1, padx=1, pady=1) 
+#fileLabeltxt = Label(gui, text='File name:')
+#fileLabeltxt.grid(row=sliderposshift+10, column=0, padx=1, pady=1) 
+#fileLabel = Label(gui, text='NA')
+#fileLabel.grid(row=sliderposshift+10, column=1, padx=1, pady=1) 
 
 # Capture from camera
 cap = cv2.VideoCapture(0)
@@ -197,7 +191,7 @@ cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
 def video_stream():
     global x, y, w, h, xp, yp, wp, hp
     setVariables()
-    """
+
     cap.set(cv2.CAP_PROP_EXPOSURE, int(expoEntry.get()))
     _, frame = cap.read()
     cv2image = cv2.rectangle(frame,(x,y),((x+w),(y+h)),(255,255,255),2)
@@ -210,7 +204,7 @@ def video_stream():
     video.imgtk = imgtk
     video.configure(image=imgtk)
     video.after(1, video_stream)
-    """
+    
     
 #setting values for x y w h window for cropping
 def setVariables():
@@ -238,7 +232,7 @@ def gui_handler():
         RecordButton.configure(text='Recording',bg='green', fg='white')
         getTextVals()
         folder_file_def()
-        fileLabel.config(text=csvname)
+        #fileLabel.config(text=csvname)
         status.config(text='Recording', foreground='green')
         threading.Thread(target=recorder).start()
     else:
@@ -255,7 +249,7 @@ def recorder():
         with open(csvname,"a") as log:
             counter += 1
             time.sleep(sleeptime)
-            """
+            
             #image cropper
             _, frame = cap.read()
             cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -272,7 +266,7 @@ def recorder():
             maximumpix=max(maximumpix, pix)            
             maxpix.config(text='Max Pix: '+ str(int(maximumpix)))
             basepix.config(text='Current Pix: '+ str(int(pix)), foreground='red')
-            """
+            
             if stop_threads:
                 cap.release()
                 break
@@ -293,22 +287,22 @@ def actuate_valve():
     getTextVals()
     while continueActuating:
         timestart=time.time()
-        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
-        print(1)
+        GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        #print(1)
         time.sleep(1/float(freq)/2 - (time.time()-timestart))        
         timestart=time.time()
-        #GPIO.output(pin, GPIO.LOW)  # Turn off the LED
-        print(0)
+        GPIO.output(pin, GPIO.LOW)  # Turn off the LED
+        #print(0)
         time.sleep(1/float(freq)/2 - (time.time()-timestart))
             
 def actuate_once_valve():
     change_state_actuate_once()    
     if actuate_once_var:
-        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
-        print(1)
+        GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
+        #print(1)
     else:
-        #GPIO.output(pin, GPIO.HIGH)  # Turn on the LED
-        print(0)
+        GPIO.output(pin, GPIO.LOW)  # Turn on the LED
+        #print(0)
             
 def quit_handle():
     global stop_threads
@@ -327,10 +321,10 @@ RecordButton.grid(row=sliderposshift+7, column=0, padx=1, pady=1)
 
 QuitButton = Button(gui, text="Quit",command = quit_handle, activebackground='red').grid(row=sliderposshift+8, column=0, padx=1, pady=1)
 
-ActuateButton = Button(gui, text='Actuate valve',command = gui_handler_actuate)
+ActuateButton = Button(gui, text='Actuate valve',command = gui_handler_actuate, activebackground='yellow')
 ActuateButton.grid(row=sliderposshift+11, column=0, padx=1, pady=1)
 
-ActuateOnceButton = Button(gui, text='Act once valve',command = actuate_once_valve, activebackground='red')
+ActuateOnceButton = Button(gui, text='Act once valve',command = actuate_once_valve, activebackground='yellow')
 ActuateOnceButton.grid(row=sliderposshift+11, column=1, padx=1, pady=1)
 
 #Loop the code
